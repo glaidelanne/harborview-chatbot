@@ -2,6 +2,17 @@
 // This runs on Vercel's servers, NOT in the browser — so your API key stays hidden.
 
 export default async function handler(req, res) {
+  // Allow requests from any origin (needed since the widget will be embedded
+  // on your Lovable site, GHL funnel, etc. — different domains than Vercel)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Browsers send a preflight OPTIONS request before the real POST — respond OK
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -22,7 +33,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-5',
         max_tokens: 300,
         system: `You are the concierge for Harborview Realty Group, a real estate agency serving Austin, TX. Your tone is warm, composed, and attentive — like a trusted advisor, not a chatbot. Speak with quiet confidence, never salesy or overly casual.
 
